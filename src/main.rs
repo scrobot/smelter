@@ -37,13 +37,13 @@ fn main() {
     }
 }
 fn melt_files(directory: &str, excludes: Vec<String>, output: &str) {
-    // Проверка существования директории
+    // Check that directory exists
     if !Path::new(directory).exists() {
         eprintln!("Error: Directory not found: {}", directory);
         return;
     }
 
-    // Проверка прав доступа к директории
+    // Check that directory accessable
     let metadata = match fs::metadata(directory) {
         Ok(metadata) => metadata,
         Err(_) => {
@@ -63,7 +63,6 @@ fn melt_files(directory: &str, excludes: Vec<String>, output: &str) {
         .filter(|e| !excludes.iter().any(|pattern| e.path().to_string_lossy().contains(pattern)))
         .collect();
 
-    // Обработка пустой директории
     if files.is_empty() {
         eprintln!("Error: No files found in the directory: {}", directory);
         return;
@@ -116,13 +115,11 @@ fn melt_files(directory: &str, excludes: Vec<String>, output: &str) {
 
     progress_bar.finish_with_message("Done!");
 
-    // Проверка и обработка пути выходного файла
     let mut output_file = PathBuf::from(output);
     if output_file.is_relative() {
         output_file = fs::canonicalize(directory).unwrap().join(&output_file);
     }
 
-    // Обработка ошибки записи
     if let Err(e) = fs::write(&output_file, output_content) {
         eprintln!("Error writing to file {}: {}", output_file.display(), e);
     }
